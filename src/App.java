@@ -1,5 +1,24 @@
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Scanner;
+
 public class App {
     public static void main(String[] args) throws Exception {
-        System.out.println("Hello, World!");
+        int k = Integer.parseInt(args[0]);
+        Scanner strain = new Scanner(new FileInputStream(args[1]));
+        Scanner stest = new Scanner(new FileInputStream(args[2]));     
+        ArrayList<String[]> train = new ArrayList<>(); 
+        
+        while(strain.hasNextLine())
+            train.add(strain.nextLine().split(","));
+
+
+    
+        /* for(String[] a : train){
+            System.out.println();
+            for(String i : a)
+                System.out.print(i + ", ");
+        } */
+        
     }
 }
