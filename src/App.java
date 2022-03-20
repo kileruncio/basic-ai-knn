@@ -8,17 +8,11 @@ public class App {
         Scanner strain = new Scanner(new FileInputStream(args[1]));
         Scanner stest = new Scanner(new FileInputStream(args[2]));     
         ArrayList<String[]> train = new ArrayList<>(); 
+        ArrayList<Line> types = new ArrayList<>();
         
-        while(strain.hasNextLine())
+        while(strain.hasNextLine()){
             train.add(strain.nextLine().split(","));
-
-
-    
-        /* for(String[] a : train){
-            System.out.println();
-            for(String i : a)
-                System.out.print(i + ", ");
-        } */
-        
+        }
+             
     }
 }
