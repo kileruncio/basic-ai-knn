@@ -5,17 +5,39 @@ import java.util.List;
 public class Line {
     private ArrayList<Double[]> vectors;
     private ArrayList<Double> tmp;
+    private List<Double> values;
     private String name;
-    // private int strike;
+    private double distance;
 
     public Line(String name){
         this.name = name;
-        // this.strike = 0;
         this.vectors = new ArrayList<>();
+    }
+
+    public Line(String name, double distance){
+        this.name = name;
+        this.distance = distance;
+    }
+
+    public Line(String name, List<Double> values){
+        this.name = name;
+        this.values = values;
     }
 
     public String getName() {
         return name;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setValues(List<Double> values) {
+        this.values = values;
+    }
+
+    public List<Double> getValues() {
+        return values;
     }
 
     public void add(String[] n){      
@@ -43,6 +65,5 @@ public class Line {
         Collections.sort(tmp);
 
         return tmp.subList(0, n);
-
     }
 }
