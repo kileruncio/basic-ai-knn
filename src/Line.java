@@ -68,12 +68,12 @@ public class Line {
         int correct = 0;
         int all = 0;
 
-        while(train.hasNext()){
+        while(train.hasNextLine()){
             String[] data = train.nextLine().split(",");
             Scanner tests = new Scanner(new FileInputStream(test));
             all++;
             
-            while(tests.hasNext()){
+            while(tests.hasNextLine()){
                 String[] tmp = tests.nextLine().split(",");
 
                 for(int i = 0; i < data.length-1; i++)

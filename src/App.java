@@ -7,7 +7,6 @@ import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) throws Exception{
-
         if(args.length > 0)
             Line.check(Integer.parseInt(args[0]), new Scanner(new FileInputStream(args[1])), args[2]);
         else{
