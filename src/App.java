@@ -1,69 +1,73 @@
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) throws Exception{
-        int correct = 0;
-        int all = 0;
-        ArrayList<Line> tmpl = new ArrayList<>(); 
-        int k = Integer.parseInt(args[0]);
-        Scanner strain = new Scanner(new FileInputStream(args[1]));
-        Scanner stest = new Scanner(new FileInputStream(args[2]));     
-        ArrayList<Line> end = new ArrayList<>();
-        HashMap<String, Line> types = new HashMap<String, Line>();
-        ArrayList<Counter> counter = new ArrayList<>();
 
-        while(strain.hasNextLine()){
-            String[] tmp = strain.nextLine().split(",");
-
-            if(types.containsKey(tmp[tmp.length-1]))
-                types.get(tmp[tmp.length-1]).add(tmp);
-            else{
-                types.put(tmp[tmp.length-1], new Line(tmp[tmp.length-1]));
-                types.get(tmp[tmp.length-1]).add(tmp);
+        if(args.length > 0)
+            Line.check(Integer.parseInt(args[0]), new Scanner(new FileInputStream(args[1])), args[2]);
+        else{
+            System.out.print("\nPodaj wektor do porownania, jesli chcesz zakonczyc wpisz -1: ");
+            Scanner s = new Scanner(System.in);
+            String in = s.next();
+            System.out.println();
+            while(Integer.parseInt(in) != -1){
+                System.out.print("Podaj wartosc k: ");
+                byHand(s.nextInt(), in);
+                in = s.next();
             }
         }
-             
-        while(stest.hasNextLine()){
-            all++;           
-            String[] tmp = stest.nextLine().split(",");
+    }
 
-            types.forEach((s, u) -> tmpl.add(new Line(s, u.check(k, tmp)))); //types ma klucze (nazwy klas) i obiekty z listami n najblizszych odleglosci
-            
-            tmpl.forEach(a -> {
-                for(double d : a.getValues())
-                    end.add(new Line(a.getName(), d));
-            });
+    public static void byHand(int k, String vector){
+        System.out.println();
+        String[] data = vector.split(",");
+        List<Line> lines = new ArrayList<>();
 
-            Collections.sort(end, Comparator.comparing(Line::getDistance));
-            
-            List<Line> finish = end.subList(0, k);
+        try{
+            Scanner s = new Scanner(new FileInputStream("bin/train-set.csv"));
+            double value = 0;
 
-            types.forEach((a, b) -> counter.add(new Counter(a)));
+            while(s.hasNext()){
+                String[] tmp = s.nextLine().split(",");
 
-            for(Counter c : counter)
-                for(Line l : finish)
-                    if(c.getType() == l.getName())
-                        c.addOne();
-                
-            Collections.sort(counter, Comparator.comparing(Counter::getNumber));
+                for(int i = 0; i < tmp.length-1; i++)
+                    value += Line.calculateDistance(Double.parseDouble(data[i]), Double.parseDouble(tmp[i]));
+                lines.add(new Line(tmp[tmp.length-1], Math.sqrt(value)));
+                value = 0;
+            }
 
-            if(counter.size() > 1 && counter.get(0).getNumber() <= counter.get(1).getNumber()){
-                if(counter.get(0).getType().equals(tmp[tmp.length-1])){
-                    ++correct;
-                    System.out.println("Zgadnieto typ");
-                }else{
-                    System.out.println("Blad");
-                }
-            }else System.out.println("asihjdfisudf");
+            lines.sort(Comparator.comparing(Line::getDistance));
+            System.out.println("Ten obiekt nalezy do grupy: " + guessAnsqwer(k, lines));
+            lines.clear();
 
+            System.out.print("\nPodaj wektor do porownania, jesli chcesz zakonczyc wpisz -1: ");
+        }catch(FileNotFoundException fnfe){
+            System.out.println("Zbior testowy musi byc w pliku o nazwie train-set.csv i znajdowac sie obok pliku App.class");
         }
+    }
 
-        System.out.println("Skutecznosc to: " + correct + "/" + all);
+    public static String guessAnsqwer(int k, List<Line> lines){
+        List<Line> tmpList = new ArrayList<>();
+        String end = new String();
+        int maxCount = 0;
+        int count = 0;
+
+        for(int i = 0; i < k; i++) 
+            tmpList.add(lines.get(i));
+
+        for(int i = 0; i < tmpList.size(); i++){
+            for(int q = 0; q < tmpList.size(); q++)
+                if(tmpList.get(i).getName().equals(tmpList.get(q).getName()))
+                    count++;
+            
+            if(count > maxCount) end = tmpList.get(i).getName();
+            count = 0;
+        }
+        return end;
     }
 }

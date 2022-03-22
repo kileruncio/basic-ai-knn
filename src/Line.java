@@ -1,31 +1,29 @@
+import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
 
 public class Line {
-    private ArrayList<Double[]> vectors;
-    private ArrayList<Double> tmp;
     private List<Double> values;
     private String name;
     private double distance;
-
-    public Line(String name){
-        this.name = name;
-        this.vectors = new ArrayList<>();
-    }
 
     public Line(String name, double distance){
         this.name = name;
         this.distance = distance;
     }
 
-    public Line(String name, List<Double> values){
-        this.name = name;
-        this.values = values;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
     }
 
     public double getDistance() {
@@ -39,31 +37,62 @@ public class Line {
     public List<Double> getValues() {
         return values;
     }
-
-    public void add(String[] n){      
-        Double[] tmp = new Double[n.length-1];
-        for(int i = 0; i < n.length-1; i++)
-            tmp[i] = Double.parseDouble(n[i]);
-        vectors.add(tmp);
+    
+    public static double calculateDistance(double d1, double d2){
+        return Math.pow(d1-d2, 2);
     }
 
-    public List<Double> check(int n, String[] data){
-        tmp = new ArrayList<Double>();
-        int tmpn = 0;
-        double tmpe = 0;
+    public static boolean guess(int k, List<Line> lines, String answer){
+        List<Line> tmpList = new ArrayList<>();
+        String end = new String();
+        int maxCount = 0;
+        int count = 0;
 
-        for(Double[] a : vectors){
-            for(double q : a){
-                tmpe += Math.pow(q-Double.parseDouble(data[tmpn]), 2);
-                tmpn++;
+        for(int i = 0; i < k; i++) 
+            tmpList.add(lines.get(i));
+
+        for(int i = 0; i < tmpList.size(); i++){
+            for(int q = 0; q < tmpList.size(); q++)
+                if(tmpList.get(i).getName().equals(tmpList.get(q).getName()))
+                    count++;
+            
+            if(count > maxCount) end = tmpList.get(i).getName();
+            count = 0;
+        }
+        return end.equals(answer);
+    }
+
+    public static void check(int k, Scanner train, String test) throws Exception{
+        List<Line> tmpList = new ArrayList<>();
+        double value = 0;
+        int correct = 0;
+        int all = 0;
+
+        while(train.hasNext()){
+            String[] data = train.nextLine().split(",");
+            Scanner tests = new Scanner(new FileInputStream(test));
+            all++;
+            
+            while(tests.hasNext()){
+                String[] tmp = tests.nextLine().split(",");
+
+                for(int i = 0; i < data.length-1; i++)
+                    value += calculateDistance(Double.parseDouble(data[i]), Double.parseDouble(tmp[i]));
+
+                tmpList.add(new Line(tmp[tmp.length-1], Math.sqrt(value)));
+                value = 0;
             }
-            tmp.add(Math.pow(tmpe, 1/2));
-            tmpe = 0;
-            tmpn = 0;
+
+            tmpList.sort(Comparator.comparing(Line::getDistance));
+
+            if(guess(k, tmpList, data[data.length-1])){
+                correct++;
+                System.out.println("Zgadnieto typ");
+            }else System.out.println("Nie udalo sie");
+
+            tmpList.clear();
         }
 
-        Collections.sort(tmp);
-
-        return tmp.subList(0, n);
+        System.out.println("Skutecznosc to: " + correct + "/" + all);
     }
 }
